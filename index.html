@@ -273,6 +273,12 @@
   .phrase .en{color:var(--muted); font-size:.92rem; margin-top:4px}
   .phrase button{margin-top:12px; background:var(--surface-2); border:1px solid var(--line); color:var(--ink); border-radius:999px; padding:7px 14px; font-weight:600; font-size:.83rem; cursor:pointer; font-family:inherit}
   .phrase button:hover{border-color:var(--red); color:var(--red)}
+  .dialect-head{max-width:720px; margin:38px 0 18px}
+  .dialect-head h3{font-size:1.45rem}
+  .dialect-head p{color:var(--muted); margin-top:8px; font-size:.98rem}
+  .phrase .use{display:inline-block; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--amber); background:var(--amber-soft); border-radius:999px; padding:3px 9px; margin-bottom:8px}
+  .dialect-note{margin-top:18px; background:var(--amber-soft); border-radius:12px; padding:14px 18px; color:var(--muted); font-size:.94rem}
+  .dialect-note b{color:var(--ink)}
 
   /* ---------- Checklist / good to know ---------- */
   .know{display:grid; grid-template-columns:1fr 1fr; gap:20px}
@@ -579,6 +585,14 @@
         <p>Menus in the best little shops are often Chinese-only. These six lines — plus pointing and smiling — will carry you through any noodle counter in Sichuan. Tap "Copy" and paste into your translation app, or just show the screen.</p>
       </div>
       <div class="phrase-grid" id="phraseGrid"></div>
+
+      <div class="dialect-head">
+        <p class="tagline">Sound like a local</p>
+        <h3>Talk like Chengdu &amp; Chongqing — the dialect you'll hear everywhere</h3>
+        <p>The six phrases above get you fed. These are the words locals actually live by — shouted across hotpot tables, muttered in teahouses, and printed on T-shirts. Drop one into conversation and the whole table warms up.</p>
+      </div>
+      <div class="phrase-grid" id="dialectGrid"></div>
+      <p class="dialect-note"><b>How to use them:</b> <b>要得</b> and <b>巴适</b> are always safe — say them about food, a seat, a price, a plan. Tone does the rest: the longer and happier you stretch <i>bāshì</i>, the more local you sound. <b>老师</b> works for almost anyone who helps you, from your driver to the noodle master.</p>
     </div>
   </section>
 
@@ -1043,6 +1057,37 @@
     return '<div class="phrase"><p class="cn">' + p.cn + '</p><p class="py">' + p.py + '</p><p class="en">' + p.en + '</p>' +
       '<button type="button" data-copy="' + i + '">Copy characters</button></div>';
   }).join('');
+
+  /* ---------- Local dialect (Chengdu & Chongqing slang) ---------- */
+  var DIALECT = [
+    { cn:'要得', py:'yàodé', tag:'Say it daily', en:'"Perfect / OK / sounds good." The happiest yes in Sichuan. The chef suggests extra chilli? Say yàodé and watch them grin.' },
+    { cn:'巴适', py:'bāshì', tag:'The classic', en:'"Comfortable, great, just right." A perfect bowl, a sunny teahouse seat, a foot massage after Chongqing stairs — it is all bāshì.' },
+    { cn:'安逸', py:'ānyì', tag:'Chengdu spirit', en:'"Relaxed and blissful." Chengdu\'s life philosophy in two characters: slow tea, long lunch, nowhere you need to rush to.' },
+    { cn:'巴适得板', py:'bāshì dé bǎn', tag:'Level up 巴适', en:'"Absolutely spot-on." When bāshì is not enough — that hotpot, that river view, that whole day. The full local seal of approval.' },
+    { cn:'雄起', py:'xióngqǐ', tag:'Cheer it', en:'"Let\'s go! You can do it!" The roar from stadiums — and from hotpot tables when someone attempts the spiciest bite.' },
+    { cn:'摆龙门阵', py:'bǎi lóngménzhèn', tag:'Teahouse talk', en:'"To shoot the breeze." Literally "lay out the dragon-gate formation" — a long, meandering teahouse chat where the stories grow taller by the hour.' },
+    { cn:'啥子', py:'sházi', tag:'Hear it everywhere', en:'"What? / What is it?" The local way to say shénme. You will hear it in every market and noodle shop — soon you will be saying it back.' },
+    { cn:'没得', py:'méidé', tag:'Good to know', en:'"Don\'t have it / none left." The answer when a famous dish sells out by 11am. Hear méidé, pick the next stall — it will be great too.' },
+    { cn:'老师', py:'lǎoshī', tag:'Instant respect', en:'Literally "teacher" — but in Sichuan you call your driver, your chef and your noodle master lǎoshī. Use it for anyone who helps you.' }
+  ];
+  var dialectGrid = document.getElementById('dialectGrid');
+  if(dialectGrid){
+    dialectGrid.innerHTML = DIALECT.map(function(p, i){
+      return '<div class="phrase"><span class="use">' + p.tag + '</span><p class="cn">' + p.cn + '</p><p class="py">' + p.py + '</p><p class="en">' + p.en + '</p>' +
+        '<button type="button" data-dialect-copy="' + i + '">Copy characters</button></div>';
+    }).join('');
+    dialectGrid.addEventListener('click', function(e){
+      var btn = e.target.closest ? e.target.closest('button[data-dialect-copy]') : null;
+      if(!btn) return;
+      var text = DIALECT[Number(btn.getAttribute('data-dialect-copy'))].cn;
+      function done(){ showToast('Copied "' + text + '" — now go say it like a local.'); }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ showToast('Copy this: ' + text); });
+      } else {
+        showToast('Copy this: ' + text);
+      }
+    });
+  }
   var toast = document.getElementById('toast');
   var toastTimer = null;
   function showToast(msg){
